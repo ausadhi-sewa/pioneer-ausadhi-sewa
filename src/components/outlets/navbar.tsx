@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { IconMenuDeep, IconX } from "@tabler/icons-react";
-import logo from "../../assets/pioneeraushadhisewa.webp";
+import logo from "../../assets/pioneer-aushadhisewa.png";
 import { useAppDispatch, useAppSelector } from "@/utils/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import {

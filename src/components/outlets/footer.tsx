@@ -5,7 +5,7 @@ import {
   Mail, 
   MapPin, 
 } from 'lucide-react';
-import logo from '../../assets/pioneeraushadhisewa.webp';
+import logo from '../../assets/pioneer-aushadhisewa.png';
 export function Footer() {
   const currentYear = new Date().getFullYear();
 

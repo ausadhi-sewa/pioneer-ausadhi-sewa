@@ -517,10 +517,11 @@ export default function HomePage() {
                       onClick={() => handleCategoryClick(category.id)}
                       className="flex flex-col items-center p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md group border border-gray-100"
                     >
-                      <div className="w-12 h-12 bg-medical-green-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-medical-green-200 transition-colors duration-200">
-                        <IconComponent className="w-6 h-6 text-medical-green-600" />
+                      <div className="w-24 h-24 bg-medical-green-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-medical-green-200 transition-colors duration-200">
+                        {/* <IconComponent className="w-6 h-6 text-medical-green-600" /> */}
+<img src={category.image} alt="categories-img" className="shadow-lg"/>
                       </div>
-                      <span className="text-xs text-gray-700 text-center font-medium leading-tight">
+                      <span className="text-md text-gray-700 text-center font-medium leading-tight">
                         {category.name}
                       </span>
                     </div>
