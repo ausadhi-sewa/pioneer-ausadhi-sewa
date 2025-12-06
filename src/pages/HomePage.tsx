@@ -2,12 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   ChevronRight,
-  Pill,
-  Leaf,
-  Stethoscope,
-  Package,
-  Heart,
-  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
@@ -80,7 +74,7 @@ export default function HomePage() {
 
   const totalPages = pagination.totalPages;
   const currentPage = pagination.page;
-  
+
   const bannerSlides = [
     {
       type: "content",
