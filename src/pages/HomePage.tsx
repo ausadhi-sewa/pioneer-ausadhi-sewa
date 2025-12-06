@@ -80,41 +80,7 @@ export default function HomePage() {
 
   const totalPages = pagination.totalPages;
   const currentPage = pagination.page;
-
-  // Category icons mapping
-  const categoryIcons: { [key: string]: any } = {
-    "pain-relief": Pill,
-    "cold-cough": Stethoscope,
-    antibiotics: Package,
-    "vitamins-supplements": Leaf,
-    "digestive-health": Heart,
-    "diabetes-care": Stethoscope,
-    "heart-blood-pressure": Heart,
-    "skin-care": Leaf,
-    "womens-health": Heart,
-    "first-aid": Package,
-    "eye-care": Eye,
-    "allergy-relief": Pill,
-    "mental-wellness": Heart,
-    "medical-devices": Stethoscope,
-    "baby-care": Heart,
-    "elderly-care": Stethoscope,
-    "respiratory-care": Stethoscope,
-    "oral-care": Package,
-    "sexual-wellness": Heart,
-    "ayurvedic-medicine": Leaf,
-    "immunity-boosters": Leaf,
-    "weight-management": Heart,
-    "bone-joint-care": Stethoscope,
-    "liver-care": Heart,
-    "kidney-care": Heart,
-    "sleep-aids": Pill,
-    "surgical-supplies": Package,
-    "personal-hygiene": Package,
-    "fitness-sports": Heart,
-    "homeopathic-medicine": Leaf,
-  };
-
+  
   const bannerSlides = [
     {
       type: "content",
