@@ -13,7 +13,7 @@ export interface Category {
   name: string;
   slug: string;
   description?: string;
-  image?: string| null;
+  image?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
