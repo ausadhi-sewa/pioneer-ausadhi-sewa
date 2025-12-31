@@ -63,16 +63,16 @@ export default function OrderDetailsModal({ order }: OrderDetailsModalProps) {
                 {order.paymentMethod.replace("_", " ")}
               </p>
               <p>
-                <strong>Subtotal:</strong> ₹{order.subtotal}
+                <strong>Subtotal:</strong> रु{order.subtotal}
               </p>
               <p>
-                <strong>Delivery Fee:</strong> ₹{order.deliveryFee}
+                <strong>Delivery Fee:</strong> रु{order.deliveryFee}
               </p>
               <p>
-                <strong>Discount:</strong> ₹{order.discount}
+                <strong>Discount:</strong> रु{order.discount}
               </p>
               <p>
-                <strong>Total:</strong> ₹{order.total}
+                <strong>Total:</strong> रु{order.total}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function OrderDetailsModal({ order }: OrderDetailsModalProps) {
                     Qty: {item.quantity}
                   </p>
                 </div>
-                <p className="text-sm font-medium">₹{item.total}</p>
+                <p className="text-sm font-medium">रु{item.total}</p>
               </div>
             ))}
           </div>

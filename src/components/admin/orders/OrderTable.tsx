@@ -174,7 +174,7 @@
 //                   </div>
 //                 </TableCell>
 //                 <TableCell>
-//                   <div className="font-medium">₹{order.total}</div>
+//                   <div className="font-medium">रु{order.total}</div>
 //                 </TableCell>
 //                 <TableCell className="text-right">
 //                   <DropdownMenu>

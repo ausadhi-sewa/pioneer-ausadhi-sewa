@@ -6,11 +6,11 @@ export default function AboutPage() {
       <section className="mx-auto w-full max-w-5xl px-4 py-10">
         <Card className="bg-transparent">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-neutral-900">About Pioneer AusadhiSewa</CardTitle>
+            <CardTitle className="text-3xl font-bold text-neutral-900">About Aushadhi Sewa</CardTitle>
           </CardHeader>
           <CardContent className="prose prose-neutral max-w-none">
             <p>
-              Pioneer Ausadhi Sewa is a modern online pharmacy focused on fast, reliable medicine delivery
+               Pioneer Aushadhi Sewa is a modern online pharmacy focused on fast, reliable medicine delivery
               and a smooth shopping experience. We aim to make healthcare more accessible by
               combining verified products with helpful information and customer-first support.
             </p>

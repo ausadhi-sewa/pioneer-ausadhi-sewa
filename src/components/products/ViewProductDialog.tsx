@@ -17,7 +17,7 @@ interface ViewProductDialogProps {
 
 export function ViewProductDialog({ open, onOpenChange, product }: ViewProductDialogProps) {
   // const formatPrice = (price: string) => {
-  //   return `₹${parseFloat(price).toFixed(2)}`;
+  //   return `रु${parseFloat(price).toFixed(2)}`;
   // };
 
   const formatDate = (dateString: string) => {
@@ -65,11 +65,11 @@ export function ViewProductDialog({ open, onOpenChange, product }: ViewProductDi
               <div>
                 <p className="text-sm font-medium text-neutral-600">Price</p>
                 <p className="text-lg font-semibold text-medical-green-600">
-                  {`₹${product.price}`}
+                  {`रु${product.price}`}
                 </p>
                 {product.discountPrice && (
                   <p className="text-sm text-red-600 line-through">
-                    {`₹${product.discountPrice}`}
+                    {`रु${product.discountPrice}`}
                   </p>
                 )}
               </div>

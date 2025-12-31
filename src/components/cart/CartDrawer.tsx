@@ -161,15 +161,15 @@ export default function CartDrawer() {
                           {item.product.discountPrice ? (
                             <>
                               <span className="text-lg font-bold text-medical-green-600">
-                                ₹ {item.product.discountPrice}
+                                रु {item.product.discountPrice}
                               </span>
                               <span className="text-sm text-neutral-400 line-through">
-                                ₹{item.product.price}
+                                रु{item.product.price}
                               </span>
                             </>
                           ) : (
                             <span className="text-lg font-bold text-medical-green-600">
-                              ₹{item.product.price}
+                              रु{item.product.price}
                             </span>
                           )}
                         </div>
@@ -224,7 +224,7 @@ export default function CartDrawer() {
                   {/* Subtotal */}
                   <div className="flex justify-between text-sm">
                     <span className="text-neutral-600">Subtotal</span>
-                    <span className="font-medium">₹{subtotal.toFixed(2)}</span>
+                    <span className="font-medium">रु{subtotal.toFixed(2)}</span>
                   </div>
                   
                   {/* Delivery Fee */}
@@ -238,7 +238,7 @@ export default function CartDrawer() {
                   {/* Total */}
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-medical-green-600">₹{subtotal.toFixed(2)}</span>
+                    <span className="text-medical-green-600">रु{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 

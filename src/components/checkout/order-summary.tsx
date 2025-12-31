@@ -79,7 +79,7 @@ export function OrderSummary({ items, subtotal, delivery, onCouponApplied }: Ord
               <p className="text-sm font-medium text-slate-900">{items[0].product.name}</p>
               <p className="text-xs text-slate-600">Qty: {items[0].quantity}</p>
             </div>
-            <span className="text-sm font-medium text-slate-900">₹{subtotal.toFixed(2)}</span>
+            <span className="text-sm font-medium text-slate-900">रु{subtotal.toFixed(2)}</span>
           </div>
         )}
 
@@ -95,7 +95,7 @@ export function OrderSummary({ items, subtotal, delivery, onCouponApplied }: Ord
                   <p className="text-xs text-green-700">
                     {appliedCoupon.coupon?.type === 'percentage' 
                       ? `${appliedCoupon.coupon.value}% off`
-                      : `₹${appliedCoupon.coupon?.value} off`
+                      : `रु${appliedCoupon.coupon?.value} off`
                     }
                   </p>
                 </div>
@@ -134,16 +134,16 @@ export function OrderSummary({ items, subtotal, delivery, onCouponApplied }: Ord
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
             <span className="text-slate-600">Subtotal</span>
-            <span className="text-slate-900">₹{subtotal.toFixed(2)}</span>
+            <span className="text-slate-900">रु{subtotal.toFixed(2)}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-600">Shipping</span>
-            <span className="text-slate-900">₹{delivery.toFixed(2)}</span>
+            <span className="text-slate-900">रु{delivery.toFixed(2)}</span>
           </div>
           {discountAmount > 0 && (
             <div className="flex items-center justify-between text-green-600">
               <span>Discount</span>
-              <span>-₹{discountAmount.toFixed(2)}</span>
+              <span>-रु{discountAmount.toFixed(2)}</span>
             </div>
           )}
         </div>
@@ -152,7 +152,7 @@ export function OrderSummary({ items, subtotal, delivery, onCouponApplied }: Ord
           <span className="text-base font-semibold text-slate-900">Total</span>
           <div className="text-right">
             <p className="text-xs text-slate-500">INR</p>
-            <p className="text-lg font-semibold text-slate-900">₹{total.toFixed(2)}</p>
+            <p className="text-lg font-semibold text-slate-900">रु{total.toFixed(2)}</p>
           </div>
         </div>
       </div>

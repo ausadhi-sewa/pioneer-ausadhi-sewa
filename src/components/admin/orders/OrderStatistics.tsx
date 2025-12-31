@@ -131,7 +131,7 @@ export default function OrderStatistics({ statistics }: OrderStatisticsProps) {
                   Total Revenue
                 </p>
                 <p className="text-2xl font-bold">
-                  ₹{statistics.totalRevenue.toLocaleString()}
+                  रु{statistics.totalRevenue.toLocaleString()}
                 </p>
               </div>
             </div>
@@ -150,7 +150,7 @@ export default function OrderStatistics({ statistics }: OrderStatisticsProps) {
                 </p>
                 <p className="text-2xl font-bold">{statistics.todayOrders}</p>
                 <p className="text-xs text-gray-500">
-                  ₹{statistics.todayRevenue.toLocaleString()}
+                  रु{statistics.todayRevenue.toLocaleString()}
                 </p>
               </div>
             </div>

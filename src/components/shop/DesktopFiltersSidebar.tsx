@@ -96,8 +96,8 @@ export default function DesktopFiltersSidebar({
                 className="w-full slider bg-gray-900"
               />
               <div className="flex justify-between text-sm text-gray-600 mt-2">
-                <span>₹{filters.priceRange[0]}</span>
-                <span>₹{filters.priceRange[1]}</span>
+                <span>रु{filters.priceRange[0]}</span>
+                <span>रु{filters.priceRange[1]}</span>
               </div>
             </div>
           </div>

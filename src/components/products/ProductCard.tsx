@@ -48,7 +48,7 @@ export default function ProductCard({
             {product.name}
           </h3>
           <div className="text-lg font-bold text-medical-green-600 mb-3">
-            ₹{product.discountPrice || product.price}
+            रु{product.discountPrice || product.price}
           </div>
           <LiquidButton
             className="text-black w-full h-10 rounded-full backdrop:bg-medical-green-100 hover:backdrop:bg-medical-green-200"

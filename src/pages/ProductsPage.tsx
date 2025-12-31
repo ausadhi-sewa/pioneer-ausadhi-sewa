@@ -247,11 +247,11 @@ export default function ProductsPage() {
           {/* Price */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-lg font-bold text-primary">
-              ₹{product.discountPrice || product.price}
+              रु{product.discountPrice || product.price}
             </span>
             {product.discountPrice && product.discountPrice < product.price && (
               <span className="text-sm text-gray-400 line-through">
-                ₹{product.price}
+                रु{product.price}
               </span>
             )}
           </div>

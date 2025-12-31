@@ -228,7 +228,7 @@ export default function CouponManagement() {
                     <TableCell>
                       {coupon.type === 'percentage' 
                         ? `${coupon.value}%` 
-                        : `₹${coupon.value}`
+                        : `रु${coupon.value}`
                       }
                     </TableCell>
                     <TableCell>
@@ -369,7 +369,7 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  {watchedType === 'percentage' ? 'Percentage (%)' : 'Amount (₹)'}
+                  {watchedType === 'percentage' ? 'Percentage (%)' : 'Amount (रु)'}
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -389,7 +389,7 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
             name="minOrderAmount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Minimum Order Amount (₹)</FormLabel>
+                <FormLabel>Minimum Order Amount (रु)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
@@ -410,7 +410,7 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
             name="maxDiscountAmount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Maximum Discount Amount (₹)</FormLabel>
+                <FormLabel>Maximum Discount Amount (रु)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"

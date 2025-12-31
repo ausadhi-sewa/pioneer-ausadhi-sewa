@@ -78,10 +78,10 @@ export default function HomePage() {
   const bannerSlides = [
     {
       type: "content",
-      title: "Pioneer Ausadhi Sewa",
+      title: "Pioneer Aushadhi Sewa",
       subtitle: "MEDICINE DELIVERY",
       description:
-        "AusadhiSewa is a modern online pharmacy focused on fast, reliable medicine delivery and a smooth shopping experience. We aim to make healthcare more accessible by combining verified products with helpful information and customer-first support.",
+        "Pioneer Aushadhi Sewa is a modern online pharmacy focused on fast, reliable medicine delivery and a smooth shopping experience. We aim to make healthcare more accessible by combining verified products with helpful information and customer-first support.",
       image: heroImage,
       hasButton: false,
     },

@@ -205,12 +205,12 @@ export default function ProductDetailsPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <span className="text-3xl font-bold text-medical-green-600">
-                  ₹{currentProduct.discountPrice || currentProduct.price}
+                  रु{currentProduct.discountPrice || currentProduct.price}
                 </span>
                 {hasDiscount && (
                   <>
                     <span className="text-xl text-neutral-400 line-through">
-                      ₹{currentProduct.price}
+                      रु{currentProduct.price}
                     </span>
                     <Badge className="bg-red-100 text-red-700 border-red-200">
                       {discountPercentage}% OFF

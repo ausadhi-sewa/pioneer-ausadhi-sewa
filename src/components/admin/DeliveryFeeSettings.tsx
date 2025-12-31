@@ -17,7 +17,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
 
   const handleUpdateFee = async () => {
     if (fee < 0 || fee > 1000) {
-      toast.error('Delivery fee must be between ₹0 and ₹1000');
+      toast.error('Delivery fee must be between रु0 and रु1000');
       return;
     }
 
@@ -46,7 +46,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="deliveryFee">Standard Delivery Fee (₹)</Label>
+          <Label htmlFor="deliveryFee">Standard Delivery Fee (रु)</Label>
           <Input
             id="deliveryFee"
             type="number"
@@ -58,7 +58,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
             placeholder="Enter delivery fee"
           />
           <p className="text-sm text-gray-600 mt-1">
-            This fee will be applied to all orders. Range: ₹0 - ₹1000
+            This fee will be applied to all orders. Range: रु0 - रु1000
           </p>
         </div>
 

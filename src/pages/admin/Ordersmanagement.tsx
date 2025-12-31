@@ -145,8 +145,8 @@ export default function OrdersPage() {
                     <tr>
                       <td>${item.product.name}</td>
                       <td>${item.quantity}</td>
-                      <td>₹${item.price}</td>
-                      <td>₹${item.total}</td>
+                      <td>रु${item.price}</td>
+                      <td>रु${item.total}</td>
                     </tr>
                   `
                     )
@@ -155,10 +155,10 @@ export default function OrdersPage() {
               </table>
             </div>
             <div class="total">
-              <p>Subtotal: ₹${order.subtotal}</p>
-              <p>Delivery Fee: ₹${order.deliveryFee}</p>
-              <p>Discount: ₹${order.discount}</p>
-              <p>Total: ₹${order.total}</p>
+              <p>Subtotal: रु${order.subtotal}</p>
+              <p>Delivery Fee: रु${order.deliveryFee}</p>
+              <p>Discount: रु${order.discount}</p>
+              <p>Total: रु${order.total}</p>
             </div>
             <div class="address">
               <h3>Delivery Address:</h3>

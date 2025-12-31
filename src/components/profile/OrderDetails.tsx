@@ -49,7 +49,7 @@ export default function OrderDetailsPage() {
 
   const formatCurrency = (amount: string | number) => {
     const n = typeof amount === "string" ? parseFloat(amount) : amount;
-    return `₹${(isNaN(n) ? 0 : n).toFixed(2)}`;
+    return `रु${(isNaN(n) ? 0 : n).toFixed(2)}`;
   };
 
   const formatDate = (dateString: string) => {

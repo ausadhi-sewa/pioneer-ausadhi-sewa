@@ -40,7 +40,7 @@ export function ProductTable({ products, loading, onView, onEdit, onDelete }: Pr
   }
 
   // const formatPrice = (price: string) => {
-  //   return `₹${parseFloat(price).toFixed(2)}`;
+  //   return `रु${parseFloat(price).toFixed(2)}`;
   // };
 
   const formatDate = (dateString: string) => {
@@ -91,10 +91,10 @@ export function ProductTable({ products, loading, onView, onEdit, onDelete }: Pr
               </TableCell>
               <TableCell>
                 <div>
-                  <p className="font-medium">{`₹${product.price}`}</p>
+                  <p className="font-medium">{`रु${product.price}`}</p>
                   {product.discountPrice && (
                     <p className="text-sm text-red-600 line-through">
-                      {`₹${product.discountPrice}`}
+                      {`रु${product.discountPrice}`}
                     </p>
                   )}
                 </div>

@@ -33,7 +33,7 @@ export default function TermsPage() {
             </ul>
             <h3>5. Limitation of Liability</h3>
             <p>
-              To the fullest extent permitted by law, AusadhiSewa is not liable for indirect,
+              To the fullest extent permitted by law, Pioneer Aushadhi Sewa is not liable for indirect,
               incidental, or consequential damages arising from your use of the service.
             </p>
           </CardContent>

@@ -314,7 +314,7 @@ export default function MyOrders() {
                           </span>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-medium">Total: ₹{order.total}</span>
+                          <span className="font-medium">Total: रु{order.total}</span>
                         </div>
                       </div>
 
