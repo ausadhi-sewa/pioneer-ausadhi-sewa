@@ -12,7 +12,7 @@ export default function TermsPage() {
             <p>Last updated: {new Date().toLocaleDateString()}</p>
             <h3>1. Acceptance of Terms</h3>
             <p>
-              By accessing or using AusadhiSewa, you agree to be bound by these Terms. If you do
+              By accessing or using Pioneer Aushadhi Sewa, you agree to be bound by these Terms. If you do
               not agree, please do not use the service.
             </p>
             <h3>2. Orders and Payments</h3>
