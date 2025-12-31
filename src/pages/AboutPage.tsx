@@ -6,7 +6,7 @@ export default function AboutPage() {
       <section className="mx-auto w-full max-w-5xl px-4 py-10">
         <Card className="bg-transparent">
           <CardHeader>
-            <CardTitle className="text-3xl font-bold text-neutral-900">About Aushadhi Sewa</CardTitle>
+            <CardTitle className="text-3xl font-bold text-neutral-900">About Pioneer Aushadhi Sewa</CardTitle>
           </CardHeader>
           <CardContent className="prose prose-neutral max-w-none">
             <p>
