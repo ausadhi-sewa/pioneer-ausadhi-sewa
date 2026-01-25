@@ -126,7 +126,10 @@ export default function ProductDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Images Carousel */}
           <div className="space-y-4">
-            <Carousel className="w-full" setApi={setCarouselApi}>
+            <Carousel opts={{
+              align: "start",
+              loop: true,
+            }} className="w-full" setApi={setCarouselApi}>
               <CarouselContent>
                 {allImages.map((imageUrl, index) => (
                   <CarouselItem key={index}>

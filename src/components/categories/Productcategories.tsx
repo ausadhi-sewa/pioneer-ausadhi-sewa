@@ -41,8 +41,8 @@ export default function Productcategories() {
     };
 
         return (
-        <div>
-            <h1>Products</h1>  
+        <div className="max-w-7xl mx-auto px-4 py-8">
+            <h1 className="text-2xl font-bold text-neutral-800 mb-6">Products</h1>  
 
             {/* {loading && <div><Skeleton className="w-full bg-gray-200 h-10 animate-pulse" /></div>}*/}
             {error && <div>Error: {error}</div>} 

@@ -108,7 +108,7 @@ export default function HomePage() {
             loop: true,
           }}
           setApi={setApi}
-          className="w-fullS"
+          className="w-full"
         >
           <CarouselContent>
             {bannerSlides.map((slide, index) => (
@@ -203,20 +203,20 @@ export default function HomePage() {
                 return (
                   <CarouselItem
                     key={category.id}
-                    className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6 xl:basis-1/8"
+                    className="pl-2 md:pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6 xl:basis-1/8 "
                   >
                     <div
                       onClick={() => handleCategoryClick(category.id)}
-                      className="flex flex-col items-center p-4 rounded-lg cursor-pointer transition-all duration-200 hover:shadow-md group border border-gray-100"
+                      className="flex flex-col items-center p-4 rounded-lg cursor-pointer transition-all duration-200  hover:shadow-lg group   "
                     >
-                      <div className="w-24 h-24 bg-medical-green-100 rounded-full flex items-center justify-center mb-2 group-hover:bg-medical-green-200 transition-colors duration-200">
+                      <div className="rounded-full flex items-center justify-center mb-2 w-24 h-24  transition-colors duration-200">
                         <img
                           src={category.image}
                           alt="categories-img"
-                          className="shadow-lg"
+                          className="objec-cover"
                         />
                       </div>
-                      <span className="text-md text-gray-700 text-center font-medium leading-tight">
+                      <span className="text-sm text-gray-700 text-center   leading-tight">
                         {category.name}
                       </span>
                     </div>

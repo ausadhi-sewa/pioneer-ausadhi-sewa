@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -41,11 +41,15 @@ const productSchema = z.object({
   name: z.string().min(1, "Product name is required").max(255),
   description: z.string().optional(),
   shortDescription: z.string().optional(),
-  price: z.number().min(0, "Price must be positive"),
-  discountPrice: z.number().min(0).optional(),
+  price: z.string().refine((val) => val !== "" && !isNaN(Number(val)) && Number(val) >= 0, {
+    message: "Price must be a positive number",
+  }),
+  discountPrice: z.string().optional(),
   sku: z.string().min(1, "SKU is required").max(100),
-  stock: z.number().min(0, "Stock must be non-negative"),
-  minStock: z.number().min(0, "Minimum stock must be non-negative"),
+  stock: z.string().refine((val) => val !== "" && !isNaN(Number(val)) && Number(val) >= 0, {
+    message: "Stock must be a non-negative number",
+  }),
+  minStock: z.string().optional(),
   categoryId: z.string().optional(),
   manufacturer: z.string().optional(),
   expiryDate: z.string().optional(),
@@ -68,22 +72,51 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
   const [galleryImages, setGalleryImages] = useState<FileWithPreview[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const firstInputRef = useRef<HTMLInputElement>(null);
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
       description: "",
       shortDescription: "",
-      price: 0,
-      discountPrice: 0,
+      price: "",
+      discountPrice: "",
       sku: "",
-      stock: 0,
-      minStock: 5,
+      stock: "",
+      minStock: "5",
       manufacturer: "",
       prescriptionRequired: "no" as const,
       isFeatured: false,
     },
   });
+
+  // Focus first input when dialog opens
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        firstInputRef.current?.focus();
+      }, 100);
+    }
+  }, [open]);
+
+  // Handle Enter key to move to next input
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const form = e.currentTarget.form;
+      if (!form) return;
+      
+      const inputs = Array.from(form.querySelectorAll(
+        'input:not([type="hidden"]):not([type="checkbox"]):not([disabled]), textarea:not([disabled]), select:not([disabled])'
+      )) as HTMLElement[];
+      
+      const currentIndex = inputs.indexOf(e.currentTarget);
+      if (currentIndex > -1 && currentIndex < inputs.length - 1) {
+        inputs[currentIndex + 1]?.focus();
+      }
+    }
+  };
 
   const onSubmit = async (data: ProductFormData) => {
     try {
@@ -91,8 +124,14 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
       const galleryFiles = galleryImages
         .map(item => item.file)
         .filter((file): file is File => file instanceof File);
+      
+      // Convert string values to numbers for API
       const productData = {
         ...data,
+        price: parseFloat(data.price) || 0,
+        discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : undefined,
+        stock: parseInt(data.stock) || 0,
+        minStock: data.minStock ? parseInt(data.minStock) : 5,
         profile: profileImage || undefined,
         gallery: galleryFiles.length > 0 ? galleryFiles : undefined,
       };
@@ -133,7 +172,12 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                   <FormItem>
                     <FormLabel>Product Name *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter product name" {...field} />
+                      <Input 
+                        placeholder="Enter product name" 
+                        {...field} 
+                        ref={firstInputRef}
+                        onKeyDown={handleKeyDown}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,7 +191,11 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                   <FormItem>
                     <FormLabel>SKU *</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter SKU" {...field} />
+                      <Input 
+                        placeholder="Enter SKU" 
+                        {...field} 
+                        onKeyDown={handleKeyDown}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -168,7 +216,7 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                         step="0.01"
                         placeholder="0.00"
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onKeyDown={handleKeyDown}
                       />
                     </FormControl>
                     <FormMessage />
@@ -188,7 +236,7 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                         step="0.01"
                         placeholder="0.00"
                         {...field}
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                        onKeyDown={handleKeyDown}
                       />
                     </FormControl>
                     <FormMessage />
@@ -209,7 +257,7 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                         type="number"
                         placeholder="0"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onKeyDown={handleKeyDown}
                       />
                     </FormControl>
                     <FormMessage />
@@ -228,7 +276,7 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                         type="number"
                         placeholder="5"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onKeyDown={handleKeyDown}
                       />
                     </FormControl>
                     <FormMessage />
@@ -270,7 +318,11 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                   <FormItem>
                     <FormLabel>Manufacturer</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter manufacturer" {...field} />
+                      <Input 
+                        placeholder="Enter manufacturer" 
+                        {...field} 
+                        onKeyDown={handleKeyDown}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -308,7 +360,11 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                   <FormItem>
                     <FormLabel>Expiry Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input 
+                        type="date" 
+                        {...field} 
+                        onKeyDown={handleKeyDown}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -323,7 +379,11 @@ export function AddProductDialog({ open, onOpenChange, categories }: AddProductD
                 <FormItem>
                   <FormLabel>Batch Number</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter batch number" {...field} />
+                    <Input 
+                      placeholder="Enter batch number" 
+                      {...field} 
+                      onKeyDown={handleKeyDown}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

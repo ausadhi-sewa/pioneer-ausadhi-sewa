@@ -28,12 +28,12 @@ export default function ProductCard({
         onClick={() => handleProductClick(product.id)}
       >
         {/* Product Image */}
-        <div className="relative  overflow-hidden flex justify-center items-center p-4">
+        <div className="relative  overflow-hidden flex justify-center items-center p-2">
           {product.profileImgUrl ? (
             <img
               src={product.profileImgUrl}
               alt={product.name}
-              className="w-[140px] h-[140px] object-cover rounded-lg"
+              className="h-[250px] w-full object-cover rounded-lg"
             />
           ) : (
             <div className="w-[140px] h-[140px] flex items-center justify-center text-neutral-400 bg-neutral-200 rounded-lg">
@@ -44,7 +44,7 @@ export default function ProductCard({
   
         {/* Product Info */}
         <div className="p-4">
-          <h3 className="font-medium text-neutral-800 mb-2 line-clamp-2">
+          <h3 className="font-medium text-xl text-neutral-800 mb-2 line-clamp-2">
             {product.name}
           </h3>
           <div className="text-lg font-bold text-medical-green-600 mb-3">
