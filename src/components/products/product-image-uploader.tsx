@@ -58,6 +58,7 @@ export default function ProductImageUploader({ onFilesChange}:  ProductImageUplo
                 Uploaded Files ({files.length})
               </h3>
               <Button
+                type="button"
                 variant="outline"
                 size="sm"
                 onClick={openFileDialog}
@@ -83,6 +84,7 @@ export default function ProductImageUploader({ onFilesChange}:  ProductImageUplo
                     className="size-full rounded-[inherit] object-cover"
                   />
                   <Button
+                    type="button"
                     onClick={() => removeFile(file.id)}
                     size="icon"
                     className="absolute -top-2 -right-2 size-6 rounded-full border-2 border-background shadow-none focus-visible:border-background"
@@ -106,7 +108,7 @@ export default function ProductImageUploader({ onFilesChange}:  ProductImageUplo
             <p className="text-xs text-muted-foreground">
               SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
             </p>
-            <Button variant="outline" className="mt-4" onClick={openFileDialog}>
+            <Button type="button" variant="outline" className="mt-4" onClick={openFileDialog}>
               <UploadIcon className="-ms-1 opacity-60" aria-hidden="true" />
               Select images
             </Button>

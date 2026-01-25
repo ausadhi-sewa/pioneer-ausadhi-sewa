@@ -94,7 +94,6 @@ export default function ProductDetailsPage() {
 
   // Prepare images array for carousel
   const allImages = [
-    currentProduct.profileImgUrl,
     ...(currentProduct.images?.map(img => img.url) || [])
   ].filter(Boolean);
 
