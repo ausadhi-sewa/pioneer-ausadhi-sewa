@@ -12,11 +12,13 @@ interface DeliveryFeeSettingsProps {
 }
 
 export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: DeliveryFeeSettingsProps) {
-  const [fee, setFee] = useState(currentFee);
+  const [fee, setFee] = useState(String(currentFee));
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const feeNumber = parseFloat(fee) || 0;
+
   const handleUpdateFee = async () => {
-    if (fee < 0 || fee > 1000) {
+    if (feeNumber < 0 || feeNumber > 1000) {
       toast.error('Delivery fee must be between रु0 and रु1000');
       return;
     }
@@ -27,7 +29,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
       // For now, we'll just update the local state
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
       
-      onFeeUpdate(fee);
+      onFeeUpdate(feeNumber);
       toast.success('Delivery fee updated successfully');
     } catch (error) {
       toast.error('Failed to update delivery fee');
@@ -51,7 +53,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
             id="deliveryFee"
             type="number"
             value={fee}
-            onChange={(e) => setFee(parseFloat(e.target.value) || 0)}
+            onChange={(e) => setFee(e.target.value)}
             min="0"
             max="1000"
             step="1"
@@ -73,7 +75,7 @@ export default function DeliveryFeeSettings({ currentFee, onFeeUpdate }: Deliver
         <div className="flex justify-end">
           <Button 
             onClick={handleUpdateFee}
-            disabled={isUpdating || fee === currentFee}
+            disabled={isUpdating || feeNumber === currentFee}
             className="flex items-center gap-2"
           >
             <Save className="w-4 h-4" />

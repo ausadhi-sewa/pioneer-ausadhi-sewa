@@ -32,13 +32,17 @@ const couponSchema = z.object({
   code: z.string().min(1, 'Coupon code is required').max(50, 'Code must be less than 50 characters'),
   description: z.string().optional(),
   type: z.enum(['percentage', 'fixed_amount']),
-  value: z.number().min(0, 'Value must be positive'),
-  minOrderAmount: z.number().min(0, 'Minimum order amount must be non-negative'),
-  maxDiscountAmount: z.number().min(0).optional(),
-  usageLimit: z.number().min(1).optional(),
+  value: z.string().refine((val) => val !== '' && !isNaN(Number(val)) && Number(val) >= 0, {
+    message: 'Value must be a positive number',
+  }),
+  minOrderAmount: z.string().refine((val) => val !== '' && !isNaN(Number(val)) && Number(val) >= 0, {
+    message: 'Minimum order amount must be a non-negative number',
+  }),
+  maxDiscountAmount: z.string().optional(),
+  usageLimit: z.string().optional(),
   validUntil: z.string().min(1, 'Valid until date is required'),
 }).refine((data) => {
-  if (data.type === 'percentage' && data.value > 100) {
+  if (data.type === 'percentage' && Number(data.value) > 100) {
     return false;
   }
   return true;
@@ -59,10 +63,10 @@ export default function CouponManagement() {
       code: '',
       description: '',
       type: 'percentage',
-      value: 0,
-      minOrderAmount: 0,
-      maxDiscountAmount: undefined,
-      usageLimit: undefined,
+      value: '',
+      minOrderAmount: '',
+      maxDiscountAmount: '',
+      usageLimit: '',
       validUntil: '',
     },
   });
@@ -85,7 +89,15 @@ export default function CouponManagement() {
 
   const handleCreateCoupon = async (data: z.infer<typeof couponSchema>) => {
     try {
-      await couponApi.createCoupon(data);
+      // Convert string values to numbers for API
+      const couponData = {
+        ...data,
+        value: parseFloat(data.value) || 0,
+        minOrderAmount: parseFloat(data.minOrderAmount) || 0,
+        maxDiscountAmount: data.maxDiscountAmount ? parseFloat(data.maxDiscountAmount) : undefined,
+        usageLimit: data.usageLimit ? parseInt(data.usageLimit) : undefined,
+      };
+      await couponApi.createCoupon(couponData);
       toast.success('Coupon created successfully');
       setIsCreateDialogOpen(false);
       form.reset();
@@ -99,10 +111,16 @@ export default function CouponManagement() {
     if (!editingCoupon) return;
     
     try {
-      await couponApi.updateCoupon({
+      // Convert string values to numbers for API
+      const couponData = {
         id: editingCoupon.id,
         ...data,
-      });
+        value: parseFloat(data.value) || 0,
+        minOrderAmount: parseFloat(data.minOrderAmount) || 0,
+        maxDiscountAmount: data.maxDiscountAmount ? parseFloat(data.maxDiscountAmount) : undefined,
+        usageLimit: data.usageLimit ? parseInt(data.usageLimit) : undefined,
+      };
+      await couponApi.updateCoupon(couponData);
       toast.success('Coupon updated successfully');
       setEditingCoupon(null);
       form.reset();
@@ -140,10 +158,10 @@ export default function CouponManagement() {
       code: coupon.code,
       description: coupon.description || '',
       type: coupon.type,
-      value: coupon.value,
-      minOrderAmount: coupon.minOrderAmount,
-      maxDiscountAmount: coupon.maxDiscountAmount,
-      usageLimit: coupon.usageLimit,
+      value: String(coupon.value),
+      minOrderAmount: String(coupon.minOrderAmount),
+      maxDiscountAmount: coupon.maxDiscountAmount ? String(coupon.maxDiscountAmount) : '',
+      usageLimit: coupon.usageLimit ? String(coupon.usageLimit) : '',
       validUntil: new Date(coupon.validUntil).toISOString().slice(0, 10),
     });
   };
@@ -376,8 +394,8 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
                     type="number"
                     min="0"
                     max={watchedType === 'percentage' ? 100 : undefined}
+                    placeholder="0"
                     {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -394,8 +412,8 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
                   <Input
                     type="number"
                     min="0"
+                    placeholder="0"
                     {...field}
-                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -417,7 +435,6 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
                     min="0"
                     placeholder="Optional"
                     {...field}
-                    onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
                   />
                 </FormControl>
                 <FormMessage />
@@ -438,7 +455,6 @@ function CouponForm({ form, onSubmit, onCancel }: CouponFormProps) {
                   min="1"
                   placeholder="Leave empty for unlimited"
                   {...field}
-                  onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : undefined)}
                 />
               </FormControl>
               <FormMessage />
