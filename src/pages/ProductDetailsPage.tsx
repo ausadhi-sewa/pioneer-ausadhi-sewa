@@ -14,6 +14,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from '@/components/ui/carousel';
+import { Lens } from '@/components/ui/lens';
 import {
   ArrowLeft,
   ShoppingCart,
@@ -133,11 +134,18 @@ export default function ProductDetailsPage() {
                 {allImages.map((imageUrl, index) => (
                   <CarouselItem key={index}>
                     <div className="aspect-square bg-white rounded-lg border border-neutral-200 overflow-hidden">
-                      <img
-                        src={imageUrl}
-                        alt={`${currentProduct.name} - Image ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
+                      <Lens
+                      zoomFactor={3}
+          lensSize={300}
+          isStatic={false}
+          ariaLabel="Zoom Area"
+                      >
+                        <img
+                          src={imageUrl}
+                          alt={`${currentProduct.name} - Image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </Lens>
                     </div>
                   </CarouselItem>
                 ))}

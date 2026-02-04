@@ -24,16 +24,17 @@ export default function ProductCard({
     {!isLoading ? (
         <div
         key={product.id}
-        className=" border  rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group"
+        className=" border  rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group "
         onClick={() => handleProductClick(product.id)}
       >
+        <div className="p-2 rounded-md ">
         {/* Product Image */}
-        <div className="relative  overflow-hidden flex justify-center items-center p-2">
+        <div className="relative overflow-hidden flex justify-center  rounded-md items-center h-[220px] bg-white ">
           {product.profileImgUrl ? (
             <img
               src={product.profileImgUrl}
               alt={product.name}
-              className="h-[250px] w-full object-cover rounded-lg"
+              className="max-h-[200px] w-auto max-w-[92%] object-contain rounded-md"
             />
           ) : (
             <div className="w-[140px] h-[140px] flex items-center justify-center text-neutral-400 bg-neutral-200 rounded-lg">
@@ -41,7 +42,7 @@ export default function ProductCard({
             </div>
           )}
         </div>
-  
+  </div>
         {/* Product Info */}
         <div className="p-4">
           <h3 className="font-medium text-xl text-neutral-800 mb-2 line-clamp-2">
