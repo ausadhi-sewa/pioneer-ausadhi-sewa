@@ -46,12 +46,28 @@ export default function Productcategories() {
 
             {/* {loading && <div><Skeleton className="w-full bg-gray-200 h-10 animate-pulse" /></div>}*/}
             {error && <div>Error: {error}</div>} 
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {/* {products.length === 0 && <div>No products found</div>} */}
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} handleProductClick={handleProductClick} handleAddToCart={handleAddToCart} isLoading={loading} />
-            ))}
-            </div>
+            {!loading && !error && products.length === 0 ? (
+              <div className="flex h-full items-center justify-center rounded-2xl border border-dashed border-slate-200  p-10 text-center">
+                <div>
+                  <p className="text-4xl font-semibold text-slate-800">Opss No products found</p>
+                  <p className="text-lg text-slate-600 mt-1">
+                    There are no products in this category yet. Please check back later.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {products.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    handleProductClick={handleProductClick}
+                    handleAddToCart={handleAddToCart}
+                    isLoading={loading}
+                  />
+                ))}
+              </div>
+            )}
         </div>
     );
 }   
