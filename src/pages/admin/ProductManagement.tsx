@@ -1,9 +1,10 @@
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 
 import {
   deleteProduct,
+  fetchProducts,
 } from "../../features/products/productSlice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,12 +25,14 @@ import { ViewProductDialog } from "../../components/products/ViewProductDialog";
 import CouponManagement from "../../components/admin/CouponManagement";
 import DeliveryFeeSettings from "../../components/admin/DeliveryFeeSettings";
 import { toast } from "sonner";
+import type { ProductFilters } from "@/api/productApi";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function DashboardPage() {
 
   const dispatch = useAppDispatch();
   const { user, loading } = useAppSelector((state) => state.auth);
-  const { products, loading: productsLoading } = useAppSelector(
+  const { products, loading: productsLoading, pagination } = useAppSelector(
     (state) => state.products
   );
   const { categories } = useAppSelector(
@@ -46,16 +49,28 @@ export default function DashboardPage() {
   // Settings state
   const [deliveryFee, setDeliveryFee] = useState(50);
   const [activeTab, setActiveTab] = useState('products');
+  const [filters, setFilters] = useState<ProductFilters>({
+    page: 1,
+    limit: 10,
+    sortBy: "createdAt",
+    order: "desc",
+  });
 
   // Fetch data on mount
-  // useEffect(() => {
-  //   if (user) {
-  //     dispatch(fetchProducts({}));
-  //     dispatch(fetchCategories());
-  //   }
-  // }, [dispatch, user]);
+  useEffect(() => {
+    if (user && activeTab === "products") {
+      dispatch(fetchProducts(filters));
+    }
+  }, [dispatch, user, activeTab, filters]);
 
-  
+  const totalPages = pagination.totalPages;
+  const currentPage = pagination.page ?? filters.page ?? 1;
+
+  const handlePageChange = (newPage: number) => {
+    const safeTotalPages = totalPages || 1;
+    const clampedPage = Math.min(Math.max(newPage, 1), safeTotalPages);
+    setFilters((prev) => ({ ...prev, page: clampedPage }));
+  };
 
   const handleViewProduct = (product: any) => {
     setSelectedProduct(product);
@@ -192,6 +207,46 @@ export default function DashboardPage() {
                     onEdit={handleEditProduct}
                     onDelete={handleDeleteProduct}
                   />
+                  {totalPages > 1 && (
+                    <div className="flex items-center justify-end mt-6 gap-2">
+                      <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+
+                      <div className="flex items-center gap-1">
+                        {[...Array(totalPages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          const isCurrentPage = pageNumber === currentPage;
+
+                          return (
+                            <button
+                              key={pageNumber}
+                              onClick={() => handlePageChange(pageNumber)}
+                              className={`px-3 py-2 rounded-lg transition-colors duration-200 ${
+                                isCurrentPage
+                                  ? "bg-medical-green-500 text-white"
+                                  : "border border-neutral-300 hover:bg-neutral-50"
+                              }`}
+                            >
+                              {pageNumber}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>

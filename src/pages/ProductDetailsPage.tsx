@@ -133,17 +133,17 @@ export default function ProductDetailsPage() {
               <CarouselContent>
                 {allImages.map((imageUrl, index) => (
                   <CarouselItem key={index}>
-                    <div className="aspect-square bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <div className="bg-white rounded-lg border border-neutral-200 flex items-center justify-center p-4">
                       <Lens
-                      zoomFactor={3}
-          lensSize={300}
-          isStatic={false}
-          ariaLabel="Zoom Area"
+                        zoomFactor={3}
+                        lensSize={300}
+                        isStatic={false}
+                        ariaLabel="Zoom Area"
                       >
                         <img
                           src={imageUrl}
                           alt={`${currentProduct.name} - Image ${index + 1}`}
-                          className="w-full h-full object-cover"
+                          className="max-h-[520px] max-w-full h-auto w-auto object-contain"
                         />
                       </Lens>
                     </div>
@@ -174,7 +174,7 @@ export default function ProductDetailsPage() {
                     <img
                       src={imageUrl}
                       alt={`${currentProduct.name} thumbnail ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-white"
                     />
                   </button>
                 ))}

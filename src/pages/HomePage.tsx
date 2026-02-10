@@ -32,7 +32,7 @@ export default function HomePage() {
   const [current, setCurrent] = React.useState(0);
   const [filters, setFilters] = useState<ProductFilters>({
     page: 1,
-    limit: 9,
+    limit: 10,
     sortBy: "createdAt",
     order: "desc",
   });
@@ -52,11 +52,16 @@ export default function HomePage() {
   }, [api]);
   useEffect(() => {
     dispatch(fetchProducts(filters));
+  }, [dispatch, filters]);
+
+  useEffect(() => {
     dispatch(fetchCategories());
-  }, []);
+  }, [dispatch]);
 
   const handlePageChange = (newPage: number) => {
-    setFilters((prev) => ({ ...prev, page: newPage }));
+    const safeTotalPages = totalPages || 1;
+    const clampedPage = Math.min(Math.max(newPage, 1), safeTotalPages);
+    setFilters((prev) => ({ ...prev, page: clampedPage }));
   };
 
   const handleProductClick = (productId: string) => {
@@ -73,7 +78,7 @@ export default function HomePage() {
   };
 
   const totalPages = pagination.totalPages;
-  const currentPage = pagination.page;
+  const currentPage = pagination.page ?? filters.page ?? 1;
 
   const bannerSlides = [
     {
@@ -250,7 +255,7 @@ export default function HomePage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center mt-8 gap-2">
+          <div className="flex items-center justify-end mt-8 gap-2">
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}

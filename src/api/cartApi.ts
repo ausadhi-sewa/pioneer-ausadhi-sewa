@@ -1,6 +1,5 @@
-import axios from 'axios';
+import { api } from './api';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 // Types
 export interface CartItem {
@@ -63,43 +62,27 @@ export interface ErrorResponse {
 }
 
 // Create axios instance with auth interceptor
-const createAuthAxios = () => {
-  const instance = axios.create({
-    baseURL: API_URL,
-    withCredentials: true,
-  });
+
 
   // Add auth token to requests if available
-  instance.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
-
-  return instance;
-};
+  
 
 export const cartApi = {
   // Get user's cart
   async getCart(): Promise<Cart> {
-    const authAxios = createAuthAxios();
-    const response = await authAxios.get<CartResponse>('/cart');
+    const response = await api.get<CartResponse>('/cart');
     return response.data.data;
   },
 
   // Add item to cart
   async addToCart(data: AddToCartRequest): Promise<Cart> {
-    const authAxios = createAuthAxios();
-    const response = await authAxios.post<CartResponse>('/cart/add', data);
+    const response = await api.post<CartResponse>('/cart/add', data);
     return response.data.data;
   },
 
   // Update cart item quantity
   async updateQuantity(itemId: string, quantity: number): Promise<Cart> {
-    const authAxios = createAuthAxios();
-    const response = await authAxios.put<CartResponse>(`/cart/items/${itemId}/quantity`, {
+    const response = await api.put<CartResponse>(`/cart/items/${itemId}/quantity`, {
       quantity,
     });
     return response.data.data;
@@ -107,15 +90,13 @@ export const cartApi = {
 
   // Remove item from cart
   async removeFromCart(itemId: string): Promise<Cart> {
-    const authAxios = createAuthAxios();
-    const response = await authAxios.delete<CartResponse>(`/cart/items/${itemId}`);
+    const response = await api.delete<CartResponse>(`/cart/items/${itemId}`);
     return response.data.data;
   },
 
   // Clear cart
   async clearCart(): Promise<Cart> {
-    const authAxios = createAuthAxios();
-    const response = await authAxios.delete<CartResponse>('/cart/clear');
+    const response = await api.delete<CartResponse>('/cart/clear');
     return response.data.data;
   },
 

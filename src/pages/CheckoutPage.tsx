@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useCart } from "../utils/hooks/useCart"
-import { useAppSelector } from "../utils/hooks"
+import { useAppDispatch, useAppSelector } from "../utils/hooks"
 import { addressApi, type CreateAddressRequest } from "@/api/addressApi"
 import { orderApi, type CreateOrderRequest } from "@/api/orderApi"
 import { type ValidateCouponResponse } from "@/api/couponApi"
@@ -10,12 +10,16 @@ import { type ValidateCouponResponse } from "@/api/couponApi"
 import { CheckoutForm, type CheckoutDetails } from "@/components/checkout/checkout-form"
 import { ReviewAndPay } from "@/components/checkout/review-pay"
 import { OrderSummary } from "@/components/checkout/order-summary"
+import { fetchDeliveryFee } from "@/features/delivery/deliverySlice"
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
   const { user } = useAppSelector((s) => s.auth)
+  const { fees, loading: deliveryLoading } = useAppSelector((s) => s.delivery)
   const { items, subtotal, clearCart } = useCart()
-  const delivery = 50
+  const activeDeliveryFee = fees.find((item) => item.status === "active")?.fee ?? 0
+  const delivery = activeDeliveryFee
   const [step, setStep] = useState<0 | 1>(0)
   const [details, setDetails] = useState<CheckoutDetails | null>(null)
   const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResponse | null>(null)
@@ -26,8 +30,14 @@ export default function CheckoutPage() {
     }
   }, [user, navigate])
 
+  useEffect(() => {
+    if (!fees.length && !deliveryLoading) {
+      dispatch(fetchDeliveryFee())
+    }
+  }, [dispatch, fees.length, deliveryLoading])
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-sky-50 via-teal-50 to-white">
+    <main className="min-h-screen ">
       <section className="mx-auto w-full max-w-6xl px-4 py-8 md:py-12">
         <header className="mb-6 md:mb-8">
           <h1 className="text-pretty text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Checkout</h1>
@@ -77,7 +87,6 @@ export default function CheckoutPage() {
                       addressId: address.id,
                       paymentMethod: "cash_on_delivery",
                       specialInstructions: undefined,
-                      deliveryFee: delivery,
                       discount: 0,
                       couponCode: appliedCoupon?.coupon?.code,
                     }
