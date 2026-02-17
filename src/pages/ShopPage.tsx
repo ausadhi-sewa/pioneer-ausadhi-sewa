@@ -22,7 +22,7 @@ interface FilterState {
 export default function ShopPage() {
   const dispatch = useAppDispatch();
   const { addToCart } = useCart();
-  const { products, loading, pagination } = useAppSelector((state) => state.products);
+  const { loading, pagination } = useAppSelector((state) => state.products);
   
 
   const [showFilters, setShowFilters] = useState(false);
@@ -43,8 +43,8 @@ export default function ShopPage() {
   // Infinite scroll
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastProductRef = useRef<HTMLDivElement>(null);
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   // Debounced search
   useEffect(() => {
@@ -54,85 +54,96 @@ export default function ShopPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // API filters
-  const apiFilters: ProductFilters = {
-    page,
-    limit: 12,
-    sortBy: filters.sortBy as any,
-    order: filters.order,
-    prescription: filters.prescription === 'all' ? undefined : (filters.prescription as 'yes' | 'no' | undefined),
-    inStock: filters.inStock || undefined,
-    featured: filters.featured,
-    minPrice: filters.priceRange[0] || undefined,
-    maxPrice: filters.priceRange[1] || undefined,
-  };
+  const fetchProductsData = useCallback(async (targetPage: number, replace = false) => {
+    const currentFilters: ProductFilters = {
+      page: targetPage,
+      limit: 10,
+      sortBy: filters.sortBy as ProductFilters['sortBy'],
+      order: filters.order,
+      prescription:
+        filters.prescription === 'all'
+          ? undefined
+          : (filters.prescription as 'yes' | 'no' | undefined),
+      inStock: filters.inStock === null ? undefined : filters.inStock,
+      featured: filters.featured || undefined,
+      minPrice: filters.priceRange[0] || undefined,
+      maxPrice: filters.priceRange[1] || undefined,
+    };
 
-  // Fetch products
-  const fetchProductsData = useCallback(async (resetPage = false) => {
-    const currentPage = resetPage ? 1 : page;
-    const currentFilters = { ...apiFilters, page: currentPage };
-    
     try {
+      let responseData: { products?: Product[]; pagination?: { totalPages?: number } };
+
       if (debouncedSearchQuery.trim()) {
-        await dispatch(searchProducts({ 
-          query: debouncedSearchQuery.trim(), 
+        responseData = await dispatch(searchProducts({
+          query: debouncedSearchQuery.trim(),
           filters: currentFilters 
         })).unwrap();
       } else {
-        await dispatch(fetchProducts(currentFilters)).unwrap();
+        responseData = await dispatch(fetchProducts(currentFilters)).unwrap();
       }
-      
-      if (resetPage) {
-        setPage(1);
-      }
+
+      const fetchedProducts = responseData.products || [];
+      const totalPages = responseData.pagination?.totalPages || 0;
+
+      setVisibleProducts((prev) => {
+        if (replace) return fetchedProducts;
+
+        const existingIds = new Set(prev.map((product) => product.id));
+        const nextProducts = fetchedProducts.filter(
+          (product) => !existingIds.has(product.id)
+        );
+        return [...prev, ...nextProducts];
+      });
+
+      setHasMore(totalPages > 0 ? targetPage < totalPages : fetchedProducts.length === 10);
     } catch (error) {
       console.error('Error fetching products:', error);
     }
-  }, [dispatch, apiFilters, debouncedSearchQuery, page]);
+  }, [dispatch, filters, debouncedSearchQuery]);
 
-  // Initial load and search
+  // Reset pagination and list when filters/search change
   useEffect(() => {
-    fetchProductsData(true);
+    setPage(1);
+    setHasMore(true);
+    setVisibleProducts([]);
   }, [debouncedSearchQuery, filters]);
 
-  // Infinite scroll setup
-  const lastProductCallback = useCallback((node: HTMLDivElement) => {
-    if (loading) return;
-    
-    if (observer.current) observer.current.disconnect();
-    
-    observer.current = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && hasMore && !loading) {
-        setPage(prevPage => prevPage + 1);
-      }
-    });
-    
-    if (node) observer.current.observe(node);
-    lastProductRef.current = node;
+  useEffect(() => {
+    setIsSearching(Boolean(debouncedSearchQuery.trim()));
+  }, [debouncedSearchQuery]);
+
+  // Fetch current page data
+  useEffect(() => {
+    fetchProductsData(page, page === 1);
+  }, [page, fetchProductsData]);
+
+  // Infinite scroll sentinel
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry.isIntersecting || loading || !hasMore) return;
+        setPage((prevPage) => prevPage + 1);
+      },
+      { root: null, rootMargin: '200px 0px', threshold: 0.1 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
   }, [loading, hasMore]);
 
-  // Load more products
-  useEffect(() => {
-    if (page > 1) {
-      fetchProductsData();
-    }
-  }, [page]);
-
-  // Update hasMore based on pagination
-  useEffect(() => {
-    setHasMore(page < pagination.totalPages);
-  }, [page, pagination.totalPages]);
-
   // Handle filter changes
-  const handleFilterChange = (key: keyof FilterState, value: any) => {
+  const handleFilterChange = (key: keyof FilterState, value: unknown) => {
     setFilters(prev => ({ ...prev, [key]: value }));
-    setPage(1);
   };
 
   // Handle search
   const handleSearch = () => {
     setIsSearching(true);
-    fetchProductsData(true);
+    setDebouncedSearchQuery(searchQuery.trim());
   };
 
   // Clear filters
@@ -148,7 +159,6 @@ export default function ShopPage() {
     setSearchQuery('');
     setDebouncedSearchQuery('');
     setIsSearching(false);
-    setPage(1);
   };
 
   // Handle product actions
@@ -164,7 +174,7 @@ export default function ShopPage() {
         setSearchQuery={setSearchQuery}
         handleSearch={handleSearch}
         isSearching={isSearching}
-        products={products}
+        products={visibleProducts}
         pagination={pagination}
         filters={filters}
         handleFilterChange={handleFilterChange}
@@ -184,7 +194,7 @@ export default function ShopPage() {
 
           {/* Main Content */}
           <div className="flex-1">
-            {!loading && products.length === 0 && (
+            {!loading && visibleProducts.length === 0 && (
               <EmptyState
                 isSearching={isSearching}
                 searchQuery={searchQuery}
@@ -192,15 +202,19 @@ export default function ShopPage() {
               />
             )}
 
-            {products.length > 0 && (
+            {visibleProducts.length > 0 && (
               <ProductsGrid
-                products={products}
-                loading={loading}
+                products={visibleProducts}
                 hasMore={hasMore}
-                lastProductCallback={lastProductCallback}
                 handleAddToCart={handleAddToCart}
               />
             )}
+            <div className="mt-6 flex justify-center">
+              {loading && visibleProducts.length > 0 && (
+                <p className="text-sm text-gray-600">Loading more products...</p>
+              )}
+            </div>
+            <div ref={loadMoreRef} aria-hidden="true" className="h-1" />
           </div>
         </div>
       </div>

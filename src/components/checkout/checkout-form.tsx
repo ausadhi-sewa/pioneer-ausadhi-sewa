@@ -23,7 +23,13 @@ const detailsSchema = z.object({
   state: z.string().min(1, "State is required"),
   pin: z.string().min(4, "PIN code is required"),
   country: z.string().min(1, "Country is required"),
-  phone: z.string().min(8, "Phone seems too short").max(16, "Phone seems too long"),
+  phone: z
+    .string()
+    .min(8, "Phone seems too short")
+    .max(16, "Phone seems too long")
+    .refine((value) => value.startsWith("+977"), {
+      message: "Phone number must start with +977",
+    }),
   save: z.boolean().default(true),
   shippingMethod: z.enum(["standard", "express"]).default("standard"),
 })
@@ -31,6 +37,12 @@ const detailsSchema = z.object({
 export type CheckoutDetails = z.infer<typeof detailsSchema>
 
 export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails) => void }) {
+  const formatNepalPhone = (value: string) => {
+    const digits = value.replace(/\D/g, "")
+    const localDigits = digits.startsWith("977") ? digits.slice(3) : digits
+    return `+977${localDigits.slice(0, 10)}`
+  }
+
   // Relax generics to avoid resolver type incompatibilities while keeping runtime validation intact
   const form = useForm<any>({
     resolver: zodResolver(detailsSchema) as any,
@@ -45,7 +57,7 @@ export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails)
       state: "",
       pin: "",
       country: "Nepal",
-      phone: "",
+      phone: "+977",
       save: true,
       shippingMethod: "standard",
     },
@@ -88,7 +100,18 @@ export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails)
                       Phone
                     </FormLabel>
                     <FormControl>
-                      <Input type="tel" inputMode="tel" placeholder="+91 98765 43210" {...field} />
+                      <Input
+                        type="tel"
+                        inputMode="tel"
+                        placeholder="+97798XXXXXXXX"
+                        value={field.value || "+977"}
+                        onChange={(e) => field.onChange(formatNepalPhone(e.target.value))}
+                        onFocus={() => {
+                          if (!field.value || !String(field.value).startsWith("+977")) {
+                            field.onChange("+977")
+                          }
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { productApi, type Product } from '../../api/productApi';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCart } from '../../utils/hooks/useCart';
@@ -8,28 +8,87 @@ export default function Productcategories() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const previousCategoryIdRef = useRef<string | undefined>(undefined);
     const { categoryId } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+
     useEffect(() => {
         const fetchProducts = async () => {
+            if (!categoryId) {
+                setLoading(false);
+                setHasMore(false);
+                return;
+            }
+
+            if (previousCategoryIdRef.current !== categoryId) {
+                previousCategoryIdRef.current = categoryId;
+                if (page !== 1) return;
+            }
+
             try {
-                    const response = await productApi.getProductsByCategory(categoryId as string, {
-                    page: 1,
+                setLoading(true);
+                setError(null);
+
+                const response = await productApi.getProductsByCategory(categoryId, {
+                    page,
                     limit: 10,
                     sortBy: 'createdAt',
                     order: 'desc'
                 });
-                setProducts(response.data.products);
-                setLoading(false);
+
+                const fetchedProducts: Product[] = response.data.products || [];
+                const totalPages = response.data.pagination?.totalPages || 0;
+
+                setProducts((prev) => {
+                    if (page === 1) return fetchedProducts;
+
+                    const existingIds = new Set(prev.map((product) => product.id));
+                    const uniqueProducts = fetchedProducts.filter(
+                        (product) => !existingIds.has(product.id)
+                    );
+                    return [...prev, ...uniqueProducts];
+                });
+
+                setHasMore(totalPages > 0 ? page < totalPages : fetchedProducts.length === 10);
             } catch (error) {
-                setError(error as string);
+                const message =
+                    error instanceof Error ? error.message : 'Failed to fetch products';
+                setError(message);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchProducts();
+    }, [categoryId, page]);
+
+    useEffect(() => {
+        setProducts([]);
+        setPage(1);
+        setHasMore(true);
+        setError(null);
     }, [categoryId]);
+
+    useEffect(() => {
+        const target = loadMoreRef.current;
+        if (!target) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                const [entry] = entries;
+                if (!entry.isIntersecting || loading || !hasMore) return;
+                setPage((prev) => prev + 1);
+            },
+            { root: null, rootMargin: '200px 0px', threshold: 0.1 }
+        );
+
+        observer.observe(target);
+        return () => observer.disconnect();
+    }, [loading, hasMore]);
 
     const handleProductClick = (productId: string) => {
         navigate(`/product/${productId}`);
@@ -63,11 +122,20 @@ export default function Productcategories() {
                     product={product}
                     handleProductClick={handleProductClick}
                     handleAddToCart={handleAddToCart}
-                    isLoading={loading}
+                    isLoading={false}
                   />
                 ))}
               </div>
             )}
+            <div className="mt-8 flex justify-center">
+              {loading && products.length > 0 && (
+                <p className="text-sm text-neutral-500">Loading more products...</p>
+              )}
+              {!hasMore && products.length > 0 && (
+                <p className="text-sm text-neutral-500">You have reached the end.</p>
+              )}
+            </div>
+            <div ref={loadMoreRef} aria-hidden="true" className="h-1" />
         </div>
     );
 }   

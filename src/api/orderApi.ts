@@ -63,6 +63,7 @@ export interface CreateOrderRequest {
   specialInstructions?: string;
   discount?: number;
   couponCode?: string;
+  deliveryFee?: number;
 }
 
 export interface OrderFilters {

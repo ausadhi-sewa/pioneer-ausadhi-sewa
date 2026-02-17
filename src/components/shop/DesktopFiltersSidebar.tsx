@@ -24,7 +24,7 @@ interface DesktopFiltersSidebarProps {
   showFilters: boolean;
   setShowFilters: (show: boolean) => void;
   filters: FilterState;
-  handleFilterChange: (key: keyof FilterState, value: any) => void;
+  handleFilterChange: (key: keyof FilterState, value: unknown) => void;
   clearFilters: () => void;
 }
 
@@ -36,8 +36,8 @@ export default function DesktopFiltersSidebar({
   clearFilters,
 }: DesktopFiltersSidebarProps) {
   return (
-    <div className={`w-80 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
-      <Card className='bg-transparent shadow-medical'>
+    <div className={`w-full lg:w-80 lg:flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'} lg:sticky lg:top-24 lg:self-start`}>
+      <Card className='bg-transparent shadow-medical lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto'>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <span>Filters</span>

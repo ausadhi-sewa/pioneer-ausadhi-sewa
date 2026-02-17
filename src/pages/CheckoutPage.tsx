@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import { useCart } from "../utils/hooks/useCart"
@@ -16,10 +16,11 @@ export default function CheckoutPage() {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((s) => s.auth)
-  const { fees, loading: deliveryLoading } = useAppSelector((s) => s.delivery)
+  const { fees } = useAppSelector((s) => s.delivery)
   const { items, subtotal, clearCart } = useCart()
-  const activeDeliveryFee = fees.find((item) => item.status === "active")?.fee ?? 0
-  const delivery = activeDeliveryFee
+  const hasFetchedDeliveryFee = useRef(false)
+  const activeDeliveryFee = Number(fees.find((item) => item.status === "active")?.fee ?? 0)
+  const delivery = Number.isFinite(activeDeliveryFee) && activeDeliveryFee > 0 ? activeDeliveryFee : 0
   const [step, setStep] = useState<0 | 1>(0)
   const [details, setDetails] = useState<CheckoutDetails | null>(null)
   const [appliedCoupon, setAppliedCoupon] = useState<ValidateCouponResponse | null>(null)
@@ -31,10 +32,10 @@ export default function CheckoutPage() {
   }, [user, navigate])
 
   useEffect(() => {
-    if (!fees.length && !deliveryLoading) {
-      dispatch(fetchDeliveryFee())
-    }
-  }, [dispatch, fees.length, deliveryLoading])
+    if (hasFetchedDeliveryFee.current) return
+    hasFetchedDeliveryFee.current = true
+    dispatch(fetchDeliveryFee())
+  }, [dispatch])
 
   return (
     <main className="min-h-screen ">
@@ -89,13 +90,23 @@ export default function CheckoutPage() {
                       specialInstructions: undefined,
                       discount: 0,
                       couponCode: appliedCoupon?.coupon?.code,
+                      deliveryFee: delivery,
                     }
                     const order = await orderApi.createOrder(orderPayload)
                     clearCart()
-                    toast.success("Order placed successfully!")
-                    navigate(`/orders/${order.id}`)
-                  } catch (e: any) {
-                    toast.error(e?.response?.data?.error || e?.message || "Failed to place order")
+                    return order.id
+                  } catch (e: unknown) {
+                    const errorMessage =
+                      typeof e === "object" &&
+                      e !== null &&
+                      "response" in e &&
+                      typeof (e as { response?: { data?: { error?: string } } }).response?.data?.error === "string"
+                        ? (e as { response?: { data?: { error?: string } } }).response?.data?.error
+                        : e instanceof Error
+                          ? e.message
+                          : "Failed to place order"
+                    toast.error(errorMessage)
+                    return null
                   }
                 }}
               />

@@ -1,8 +1,4 @@
-import React, { useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/hooks";
 import { fetchProducts } from "../features/products/productSlice";
@@ -12,6 +8,7 @@ import type { Product, ProductFilters } from "../api/productApi";
 import heroImage from "../assets/hero-removebg-preview.png";
 import ProductCard from "@/components/products/ProductCard";
 import Autoplay from "embla-carousel-autoplay";
+import type { EmblaCarouselType } from "embla-carousel";
 import {
   Carousel,
   CarouselContent,
@@ -28,8 +25,10 @@ export default function HomePage() {
   );
   const { categories } = useAppSelector((state) => state.categories);
   const { addToCart } = useCart();
-  const [api, setApi] = React.useState<any>();
+  const [api, setApi] = React.useState<EmblaCarouselType>();
   const [current, setCurrent] = React.useState(0);
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [filters, setFilters] = useState<ProductFilters>({
     page: 1,
     limit: 10,
@@ -58,12 +57,6 @@ export default function HomePage() {
     dispatch(fetchCategories());
   }, [dispatch]);
 
-  const handlePageChange = (newPage: number) => {
-    const safeTotalPages = totalPages || 1;
-    const clampedPage = Math.min(Math.max(newPage, 1), safeTotalPages);
-    setFilters((prev) => ({ ...prev, page: clampedPage }));
-  };
-
   const handleProductClick = (productId: string) => {
     navigate(`/product/${productId}`);
   };
@@ -78,7 +71,46 @@ export default function HomePage() {
   };
 
   const totalPages = pagination.totalPages;
-  const currentPage = pagination.page ?? filters.page ?? 1;
+  const currentPage = pagination.page ?? 1;
+  const hasMoreProducts = totalPages > 0 && currentPage < totalPages;
+
+  useEffect(() => {
+    if (currentPage <= 1) {
+      setVisibleProducts(products);
+      return;
+    }
+
+    setVisibleProducts((prev) => {
+      const existingIds = new Set(prev.map((item) => item.id));
+      const nextProducts = products.filter((item) => !existingIds.has(item.id));
+      return [...prev, ...nextProducts];
+    });
+  }, [products, currentPage]);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry.isIntersecting || loading || !hasMoreProducts) return;
+
+        setFilters((prev) => ({
+          ...prev,
+          page: (prev.page ?? 1) + 1,
+        }));
+      },
+      {
+        root: null,
+        rootMargin: "200px 0px",
+        threshold: 0.1,
+      }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [loading, hasMoreProducts]);
 
   const bannerSlides = [
     {
@@ -242,58 +274,30 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {products.map((product: Product) => (
+          {visibleProducts.map((product: Product) => (
             <ProductCard
               key={product.id}
               product={product}
               handleProductClick={handleProductClick}
               handleAddToCart={handleAddToCart}
-              isLoading={loading}
+              isLoading={false}
             />
           ))}
         </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-end mt-8 gap-2">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            <div className="flex items-center gap-1">
-              {[...Array(totalPages)].map((_, index) => {
-                const pageNumber = index + 1;
-                const isCurrentPage = pageNumber === currentPage;
-
-                return (
-                  <button
-                    key={pageNumber}
-                    onClick={() => handlePageChange(pageNumber)}
-                    className={`px-3 py-2 rounded-lg transition-colors duration-200 ${
-                      isCurrentPage
-                        ? "bg-medical-green-500 text-white"
-                        : "border border-neutral-300 hover:bg-neutral-50"
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        <div className="mt-8 flex justify-center">
+          {loading && visibleProducts.length > 0 && (
+            <p className="text-sm text-neutral-500">Loading more products...</p>
+          )}
+          {!hasMoreProducts && visibleProducts.length > 0 && (
+            <p className="text-sm text-neutral-500">You have reached the end.</p>
+          )}
+        </div>
+        <div
+          ref={loadMoreRef}
+          aria-hidden="true"
+          className="h-1"
+        />
       </div>
     </div>
   );

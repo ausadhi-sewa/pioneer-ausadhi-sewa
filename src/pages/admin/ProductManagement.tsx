@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useAppDispatch, useAppSelector } from "../../utils/hooks";
 
 import {
   deleteProduct,
   fetchProducts,
+  searchProducts,
 } from "../../features/products/productSlice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 // Note: Tabs component needs to be created or imported from a UI library
 // For now, we'll use a simple div-based tab implementation
 import {
@@ -17,6 +19,7 @@ import {
   IconDiscount,
   IconSettings,
 } from "@tabler/icons-react";
+import { Search } from "lucide-react";
 import { ProductTable } from "../../components/products/ProductTable";
 import { AddProductDialog } from "../../components/products/AddProductDialog";
 import { AddCategoryDialog } from "../../components/categories/AddCategoryDialog";
@@ -26,7 +29,7 @@ import CouponManagement from "../../components/admin/CouponManagement";
 import DeliveryFeeSettings from "../../components/admin/DeliveryFeeSettings";
 import { toast } from "sonner";
 import type { ProductFilters } from "@/api/productApi";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { Product } from "@/api/productApi";
 
 export default function DashboardPage() {
 
@@ -44,11 +47,16 @@ export default function DashboardPage() {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [editProductOpen, setEditProductOpen] = useState(false);
   const [viewProductOpen, setViewProductOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
   // Settings state
   const [deliveryFee, setDeliveryFee] = useState(50);
   const [activeTab, setActiveTab] = useState('products');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [visibleProducts, setVisibleProducts] = useState<Product[]>([]);
+  const [hasMoreProducts, setHasMoreProducts] = useState(true);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const [filters, setFilters] = useState<ProductFilters>({
     page: 1,
     limit: 10,
@@ -56,28 +64,86 @@ export default function DashboardPage() {
     order: "desc",
   });
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery.trim());
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // Fetch data on mount
   useEffect(() => {
-    if (user && activeTab === "products") {
-      dispatch(fetchProducts(filters));
+    if (!user || activeTab !== "products") return;
+
+    if (debouncedSearchQuery) {
+      dispatch(
+        searchProducts({
+          query: debouncedSearchQuery,
+          filters,
+        })
+      );
+      return;
     }
-  }, [dispatch, user, activeTab, filters]);
+
+    dispatch(fetchProducts(filters));
+  }, [dispatch, user, activeTab, filters, debouncedSearchQuery]);
 
   const totalPages = pagination.totalPages;
-  const currentPage = pagination.page ?? filters.page ?? 1;
+  const currentPage = pagination.page ?? 1;
 
-  const handlePageChange = (newPage: number) => {
-    const safeTotalPages = totalPages || 1;
-    const clampedPage = Math.min(Math.max(newPage, 1), safeTotalPages);
-    setFilters((prev) => ({ ...prev, page: clampedPage }));
-  };
+  useEffect(() => {
+    if (activeTab !== "products") return;
 
-  const handleViewProduct = (product: any) => {
+    if (currentPage <= 1) {
+      setVisibleProducts(products);
+      return;
+    }
+
+    setVisibleProducts((prev) => {
+      const existingIds = new Set(prev.map((item) => item.id));
+      const nextProducts = products.filter((item) => !existingIds.has(item.id));
+      return [...prev, ...nextProducts];
+    });
+  }, [products, currentPage, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "products") return;
+    setHasMoreProducts(totalPages > 0 && currentPage < totalPages);
+  }, [totalPages, currentPage, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "products") return;
+
+    const target = loadMoreRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (!entry.isIntersecting || productsLoading || !hasMoreProducts) return;
+        setFilters((prev) => ({ ...prev, page: (prev.page ?? 1) + 1 }));
+      },
+      { root: null, rootMargin: "200px 0px", threshold: 0.1 }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [productsLoading, hasMoreProducts, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== "products") return;
+    setVisibleProducts([]);
+    setHasMoreProducts(true);
+    setFilters((prev) => ({ ...prev, page: 1 }));
+  }, [activeTab, debouncedSearchQuery]);
+
+  const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
     setViewProductOpen(true);
   };
 
-  const handleEditProduct = (product: any) => {
+  const handleEditProduct = (product: Product) => {
     setSelectedProduct(product);
     setEditProductOpen(true);
   };
@@ -86,8 +152,9 @@ export default function DashboardPage() {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         await dispatch(deleteProduct(productId)).unwrap();
+        setVisibleProducts((prev) => prev.filter((product) => product.id !== productId));
        
-      } catch (error) {
+      } catch {
        toast.error("Failed to delete product");
       }
     }
@@ -197,56 +264,38 @@ export default function DashboardPage() {
               {/* Products Table */}
               <Card className="bg-transparent">
                 <CardHeader>
-                  <CardTitle className="text-xl">Product Management</CardTitle>
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                    <CardTitle className="text-xl">Product Management</CardTitle>
+                    <div className="relative w-full lg:w-80">
+                      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+                      <Input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search products..."
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <ProductTable
-                    products={products}
+                    products={visibleProducts}
                     loading={productsLoading}
+                    isLoadingMore={productsLoading && visibleProducts.length > 0}
                     onView={handleViewProduct}
                     onEdit={handleEditProduct}
                     onDelete={handleDeleteProduct}
                   />
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-end mt-6 gap-2">
-                      <button
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                        className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        {[...Array(totalPages)].map((_, index) => {
-                          const pageNumber = index + 1;
-                          const isCurrentPage = pageNumber === currentPage;
-
-                          return (
-                            <button
-                              key={pageNumber}
-                              onClick={() => handlePageChange(pageNumber)}
-                              className={`px-3 py-2 rounded-lg transition-colors duration-200 ${
-                                isCurrentPage
-                                  ? "bg-medical-green-500 text-white"
-                                  : "border border-neutral-300 hover:bg-neutral-50"
-                              }`}
-                            >
-                              {pageNumber}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <button
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                        className="px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+                  <div className="mt-4 flex justify-center">
+                    {productsLoading && visibleProducts.length > 0 && (
+                      <p className="text-sm text-neutral-500">Loading more products...</p>
+                    )}
+                    {!hasMoreProducts && visibleProducts.length > 0 && (
+                      <p className="text-sm text-neutral-500">You have reached the end.</p>
+                    )}
+                  </div>
+                  <div ref={loadMoreRef} aria-hidden="true" className="h-1" />
                 </CardContent>
               </Card>
             </div>

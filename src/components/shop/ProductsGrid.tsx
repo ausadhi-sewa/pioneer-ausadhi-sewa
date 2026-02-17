@@ -4,17 +4,13 @@ import ProductCard from '../products/ProductCard';
 
 interface ProductsGridProps {
   products: Product[];
-  loading: boolean;
   hasMore: boolean;
-  lastProductCallback: (node: HTMLDivElement) => void;
   handleAddToCart: (product: Product) => void;
 }
 
 export default function ProductsGrid({
   products,
-  loading,
   hasMore,
-  lastProductCallback,
   handleAddToCart,
 }: ProductsGridProps) {
   const navigate = useNavigate();
@@ -22,8 +18,8 @@ export default function ProductsGrid({
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {products.map((product, index) => (
-          <div key={product.id} ref={index === products.length - 1 ? lastProductCallback : undefined}>
+        {products.map((product) => (
+          <div key={product.id}>
             <ProductCard 
               product={product} 
               handleProductClick={(id: string) => navigate(`/product/${id}`)}
@@ -31,7 +27,7 @@ export default function ProductsGrid({
                 e.stopPropagation();
                 handleAddToCart(product);
               }}
-              isLoading={loading}
+              isLoading={false}
             />
           </div>
         ))}
