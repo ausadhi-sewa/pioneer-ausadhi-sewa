@@ -331,8 +331,22 @@ export function Navbar() {
         )}
       </nav>
 
-      {/* Cart Drawer */}
-      <CartDrawer />
+     
+      <CartDrawer 
+       open={authDialogOpen}
+        onOpenChange={setAuthDialogOpen}
+        onSubmit={handleAuthSubmit}
+        onGoogleClick={handleGoogleClick}
+        isSignup={isSignup}
+        onToggleMode={setIsSignup}
+        loading={loading}
+        googleLoading={loading}
+        error={error}
+        requiresEmailConfirmation={requiresEmailConfirmation}
+        confirmationEmail={confirmationEmail}
+        onResendEmail={handleResendEmail}
+        onCloseEmailConfirmation={handleCloseEmailConfirmation}
+      />
 
       {/* Auth Dialog */}
       <AuthDialog

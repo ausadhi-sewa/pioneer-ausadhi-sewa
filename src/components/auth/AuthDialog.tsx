@@ -36,7 +36,7 @@ const signupSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 type SignupFormData = z.infer<typeof signupSchema>;
 
-interface AuthDialogProps {
+export interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: LoginFormData | Omit<SignupFormData, 'confirmPassword'>) => void;
