@@ -48,10 +48,13 @@ export default function CartDrawer(props: AuthDialogProps) {
     clearCartError,
   } = useCart();
 
-  const handleClose = () => {
-    dispatch(closeCart());
-    if (error) {
-      clearCartError();
+  const handleClose = (open?: boolean) => {
+    // Only close the cart if Drawer is being closed by user, not when opening AuthDialog
+    if (open === false) {
+      dispatch(closeCart());
+      if (error) {
+        clearCartError();
+      }
     }
   };
 
@@ -69,7 +72,7 @@ export default function CartDrawer(props: AuthDialogProps) {
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
-     setAuthDialogOpen(true);
+      setAuthDialogOpen(true);
       return;
     }
     dispatch(closeCart());

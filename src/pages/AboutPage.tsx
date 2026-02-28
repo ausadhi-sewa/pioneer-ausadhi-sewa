@@ -20,19 +20,19 @@ export default function AboutPage() {
             <CardTitle className="text-3xl font-bold text-neutral-900">About Pioneer Aushadhi Sewa</CardTitle>
           </CardHeader>
           <CardContent className="prose prose-neutral max-w-none">
-            <p>
+            <p className='text-black'>
                Pioneer Aushadhi Sewa is a modern online pharmacy focused on fast, reliable medicine delivery
               and a smooth shopping experience. We aim to make healthcare more accessible by
               combining verified products with helpful information and customer-first support.
             </p>
-            <h3>What we value</h3>
-            <ul>
+            <h3 className='pt-4'>What we value</h3>
+        <ol className="list-disc list-inside space-y-1">
               <li>Authentic, quality-checked medicines</li>
               <li>Clear pricing and transparent communication</li>
               <li>Fast delivery within our service areas</li>
               <li>Privacy and data protection</li>
-            </ul>
-            <h3>Contact</h3>
+            </ol>
+            <h3 className='pt-4'>Contact</h3>
             <p>
               Have questions? Reach us at <strong>pioneeraushadhisewa@gmail.com</strong> or call
               <strong> +977 9705467105</strong>.
@@ -42,7 +42,7 @@ export default function AboutPage() {
           <CardContent className="p-6 md:p-8">
             <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-center justify-center">
               {/* Left Side - Profile Image and Name */}
-              <div className="flex flex-col items-center md:items-start w-full md:w-1/3 flex-shrink-0">
+              <div className="flex flex-col items-center justify-center w-full md:w-1/3 flex-shrink-0">
                 <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-[#16a34a] mb-4 mx-auto md:mx-0">
                   <img
                     src={logo}
@@ -50,10 +50,11 @@ export default function AboutPage() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold text-neutral-800 mb-1 text-center md:text-left w-full">
+
+                <h2 className="text-xl md:text-2xl font-bold text-neutral-800 mb-1 text-center w-full">
                   SAMIR AKHTAR
                 </h2>
-                <p className="text-sm md:text-base font-semibold text-[#16a34a] mb-0 text-center md:text-left w-full">
+                <p className="text-sm md:text-base font-semibold text-[#16a34a] mb-0 text-center w-full">
                   FOUNDER & CEO
                 </p>
               </div>

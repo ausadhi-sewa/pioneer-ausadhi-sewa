@@ -37,11 +37,7 @@ const detailsSchema = z.object({
 export type CheckoutDetails = z.infer<typeof detailsSchema>
 
 export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails) => void }) {
-  const formatNepalPhone = (value: string) => {
-    const digits = value.replace(/\D/g, "")
-    const localDigits = digits.startsWith("977") ? digits.slice(3) : digits
-    return `+977${localDigits.slice(0, 10)}`
-  }
+
 
   // Relax generics to avoid resolver type incompatibilities while keeping runtime validation intact
   const form = useForm<any>({
@@ -57,7 +53,7 @@ export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails)
       state: "",
       pin: "",
       country: "Nepal",
-      phone: "+977",
+      phone: "",
       save: true,
       shippingMethod: "standard",
     },
@@ -103,14 +99,9 @@ export function CheckoutForm({ onSubmit }: { onSubmit: (values: CheckoutDetails)
                       <Input
                         type="tel"
                         inputMode="tel"
-                        placeholder="+97798XXXXXXXX"
-                        value={field.value || "+977"}
-                        onChange={(e) => field.onChange(formatNepalPhone(e.target.value))}
-                        onFocus={() => {
-                          if (!field.value || !String(field.value).startsWith("+977")) {
-                            field.onChange("+977")
-                          }
-                        }}
+                        placeholder="+977 9705467105"
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormMessage />
